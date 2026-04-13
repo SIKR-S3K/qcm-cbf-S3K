@@ -1,4 +1,4 @@
- clc
+clc
 clear
 close all
 
@@ -87,10 +87,6 @@ drawnow
 
 
 
-
-
-
-
     %%% controller synthesis
     % robot does not care about the obstacles
     uBall = uNomBall;
@@ -148,6 +144,7 @@ drawnow
         ballWorld.obstacles{i}.center = ballWorld.obstacles{i}.center + xDotI*DT;
         ballWorld.obstacles{i}.radius = ballWorld.obstacles{i}.radius + rDotI*DT;
     end
+    
     
 
 
