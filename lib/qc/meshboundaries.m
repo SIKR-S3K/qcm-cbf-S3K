@@ -23,8 +23,10 @@ function [bds, outer] = meshboundaries(f)
 %% this version is older but works
 nv = max(f(:));
 v = zeros(nv, 2);
-tr = triangulation(f, v);
-fe = tr.freeBoundary;
+tr = triangulation(f, v); % reproduce same f and v via triangulation to extract all boundaries
+% points = vertex v
+% connectivity list = face f
+fe = tr.freeBoundary; % an object function of triangulation
 if isempty(fe)
   bds = {};
   outer = [];

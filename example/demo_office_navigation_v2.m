@@ -129,7 +129,56 @@ end
 x = [1.8;2.]; col_ = 4;
 
 vertices_all = {vertices_x, vertices_y};
-wwo = WorldWithObstacleMappingQC(vertices_all, ballWorld.domain, ballWorld.obstacles);
+% this.vertices = polyshape(vertices_all{1}, vertices_all{2})
+% subplot(1,2,1)
+% plot(this.vertices)
+% tr = triangulation(this.vertices)
+% subplot(1,2,2)
+% triplot(tr)
+% model = createpde % create empty scalar pde structure (1 equation) 
+% geometryFromMesh(model, tr.Points', tr.ConnectivityList')
+% generateMesh(model,'Hmax',0.1)
+% v = model.Mesh.Nodes'
+% f = model.Mesh.Elements'
+% f = f(:,1:3);
+% father = unique(f)
+% index = zeros(max(father),1)
+% index(father) = (1:size(father,1))
+% face_new = index(f)
+% vertex_new = v(father,:)
+% 
+% bd = meshboundaries(f)
+% 
+% 
+% nv = max(f(:)); % f(:) list out all elements of f in order
+% v = zeros(nv, 2);
+% tr = triangulation(f, v);
+% fe = tr.freeBoundary;
+% if isempty(fe)
+%   bds = {};
+%   outer = [];
+%   return;
+% end
+% [~, order] = sort(fe(:, 1))
+% fe = fe(order, :) % reordered boundary edges
+% ex = zeros(nv, 1) 
+% vs = false(nv, 1) 
+% nfe = size(fe, 1)
+% for i = 1 : nfe
+%   ex(fe(i, 1)) = fe(i, 2); % table of second edge vertex
+% end
+% 
+% 
+% bd_outer_id = 1;
+% bdy_index = bd{bd_outer_id};
+% va = v(bdy_index,1)
+% vb = v(bdy_index([2:end,1]),1)
+
+
+
+
+
+wwo = WorldWithObstacleMappingQC(vertices_all, ballWorld.domain, ballWorld.obstacles); % Construct
 wwo.storeState(x);
 r2bMap = wwo.getReal2BallMapHandle();
 b2rMap = wwo.getBall2RealMapHandle_new();
@@ -159,7 +208,7 @@ PLOT = true;
 if PLOT
 figure(1); %('units','normalized','position',[0 0 1 1])
 %clf;
-% subplot(1,2,1), 
+subplot(1,2,1), 
 hold on, axis equal, axis([-3 3 -3 3]), set(gca, 'Visible', 'off')
 hSTraj = line(x(1), x(2), 'Color', myColors{col_}, 'LineWidth', 2);
 hS = scatter(x(1), x(2), 'MarkerEdgeColor', [0 0.4470 0.7410], 'MarkerFaceColor', [0 0.4470 0.7410]);
@@ -169,17 +218,18 @@ for i = 1 : Nobst
 end
 scatter(xG(1), xG(2), 'MarkerEdgeColor', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840]);
 
-% subplot(1,2,2), hold on, axis equal, axis([-6 6 -6 6]), set(gca, 'Visible', 'off')
-% hSBall = scatter(xBall(1), xBall(2), 'filled');
-% hSTrajBall = line(xBall(1), xBall(2), 'LineWidth', 2);
-% domainBall = ballWorld.domain.center + ballWorld.domain.radius * [cos(linspace(0,2*pi,100)); sin(linspace(0,2*pi,100))];
-% plot(domainBall(1,[1:end,1]), domainBall(2,[1:end,1]), 'LineWidth', 2)
-% hObstBall = cell(1,numel(ballWorld.obstacles));
-% for i = 1 : Nobst
-%     obstBall = ballWorld.obstacles{i}.center + ballWorld.obstacles{i}.radius * [cos(linspace(0,2*pi,100)); sin(linspace(0,2*pi,100))];
-%     hObstBall{i} = plot(obstBall(1,[1:end,1]), obstBall(2,[1:end,1]), 'Color', [.5 0 .5], 'LineWidth', 2);
-% end
-% hGBall = scatter(xGBall(1), xGBall(2), 'filled');
+subplot(1,2,2), 
+hold on, axis equal, axis([-6 6 -6 6]), set(gca, 'Visible', 'off')
+hSBall = scatter(xBall(1), xBall(2), 'filled');
+hSTrajBall = line(xBall(1), xBall(2), 'LineWidth', 2);
+domainBall = ballWorld.domain.center + ballWorld.domain.radius * [cos(linspace(0,2*pi,100)); sin(linspace(0,2*pi,100))];
+plot(domainBall(1,[1:end,1]), domainBall(2,[1:end,1]), 'LineWidth', 2)
+hObstBall = cell(1,numel(ballWorld.obstacles));
+for i = 1 : Nobst
+    obstBall = ballWorld.obstacles{i}.center + ballWorld.obstacles{i}.radius * [cos(linspace(0,2*pi,100)); sin(linspace(0,2*pi,100))];
+    hObstBall{i} = plot(obstBall(1,[1:end,1]), obstBall(2,[1:end,1]), 'Color', [.5 0 .5], 'LineWidth', 2);
+end
+hGBall = scatter(xGBall(1), xGBall(2), 'filled');
 F(1) = getframe(gcf) ;
 drawnow
 end
@@ -187,7 +237,9 @@ end
 %pause
 
 %% main loop
-for t = 2 : T_MAX   
+% for t = 2 : T_MAX
+t = 2;
+while norm(x - xG) > 1e-3
     %%% check obstacles
     
     %%% real to ball
@@ -206,6 +258,10 @@ for t = 2 : T_MAX
     % robot does not care about the obstacles
     uBall = uNomBall;
     % obstacles care about the robot
+    %% from older version code
+    safetyScale = 3; 
+    roimin = 0.5;
+    %%
     uObstNomBall = zeros(2*Nobst,1);
     rhoObstNomBall = zeros(Nobst,1);
     for i = 1 : Nobst
@@ -214,10 +270,36 @@ for t = 2 : T_MAX
     end
     Acbf = zeros(Nobst,3*Nobst);
     bcbf = zeros(Nobst,1);
+    % for i = 1 : Nobst
+    %     Acbf(i,2*i-1:2*i) = 2*(xBall-ballWorld.obstacles{i}.center)';
+    %     Acbf(i,2*Nobst+i) = 2*ballWorld.obstacles{i}.radius;
+    %     bcbf(i) = 2*(xBall-ballWorld.obstacles{i}.center)'*uBall + 0.2e2 * (norm(xBall-ballWorld.obstacles{i}.center)^2-ballWorld.obstacles{i}.radius^2);
+    % end
     for i = 1 : Nobst
-        Acbf(i,2*i-1:2*i) = 2*(xBall-ballWorld.obstacles{i}.center)';
-        Acbf(i,2*Nobst+i) = 2*ballWorld.obstacles{i}.radius;
-        bcbf(i) = 2*(xBall-ballWorld.obstacles{i}.center)'*uBall + 0.2e2 * (norm(xBall-ballWorld.obstacles{i}.center)^2-ballWorld.obstacles{i}.radius^2);
+        xoiHat = ballWorld.obstacles{i}.centerOriginal;
+        roiHat = ballWorld.obstacles{i}.radiusOriginal;
+        xoi = ballWorld.obstacles{i}.center;
+        roi = ballWorld.obstacles{i}.radius;
+        xd = ballWorld.domain.center;
+        rd = ballWorld.domain.radius;
+        xDotObstNomBall(2*i-1:2*i) = 100*(xoiHat - xoi);
+        rDotObstNomBall(i) = 100*(roiHat - roi);
+        % do not collide with robot
+        Acbf(end+1,[2*i-1:2*i,2*Nobst+i]) = [-2*(xoi-xBall)', 2*safetyScale*roi];
+        bcbf(end+1,1) = -2*(xoi-xBall)'*uBall + 1e2 * (norm(xoi-xBall)^2-(safetyScale*roi)^2);
+        % do not go out of environment
+        Acbf(end+1,[2*i-1:2*i,2*Nobst+i]) = [2*(xoi-xd)', 2*(rd-roi)];
+        bcbf(end+1,1) = 1e2 * ((rd-roi)^2-norm(xoi-xd)^2);
+        % do not collide with other obstacles
+        for j = i+1 : Nobst
+            xoj = ballWorld.obstacles{j}.center;
+            roj = ballWorld.obstacles{j}.radius;
+            Acbf(end+1,[2*i-1:2*i,2*j-1:2*j,2*Nobst+i,2*Nobst+j]) = [-2*(xoi-xoj)', 2*(xoi-xoj)', 2*(roi+roj), 2*(roi+roj)];
+            bcbf(end+1,1) = 1e2 * (norm(xoi-xoj)^2-(roi+roj)^2);
+        end
+        % keep minimum obstacle radius
+        Acbf(end+1,2*Nobst+i) = -2*roi;
+        bcbf(end+1,1) = 1e2 * (roi^2-roimin^2);
     end
     if strcmp(POSITION_RADIUS, 'move')
         Wcenter = 1;
@@ -258,7 +340,7 @@ for t = 2 : T_MAX
     if ALL_IN_BALL
         xBall = xBall + uBall*DT;
         x = b2rMap(xBall);
-        xBall = r2bMap(x);
+        xBall = r2bMap(x); % Why, isn't r2bMap(b2rMap(xBall))=xBall?
     else
         % Both jacobian transpose and damped least square work here, but
         % damped least square cause small jump in the ball world. The 
@@ -293,4 +375,6 @@ for t = 2 : T_MAX
     hSTrajBall.YData = xTrajBall(2,1:t);
     F(t) = getframe(gcf);
     drawnow
+
+    % t = t + 1;
 end

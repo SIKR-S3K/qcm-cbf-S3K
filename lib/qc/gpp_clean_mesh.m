@@ -27,8 +27,8 @@
 
 function [face_new,vertex_new,father] = gpp_clean_mesh(face,vertex)
 % remove unreferenced vertex
-father = unique(face);
-index = zeros(max(father),1);
-index(father) = (1:size(father,1));
-face_new = index(face);
-vertex_new = vertex(father,:);
+father = unique(face); % create a list of indicies marking vertices
+index = zeros(max(father),1); % ? This seems redundant
+index(father) = (1:size(father,1)); % ? This seems redundant
+face_new = index(face); % The output of this line is the same as variable "face"???
+vertex_new = vertex(father,:); % only taking the first size(father,1) rows
