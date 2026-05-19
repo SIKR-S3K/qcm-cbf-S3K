@@ -376,5 +376,5 @@ while norm(x - xG) > 1e-3
     F(t) = getframe(gcf);
     drawnow
 
-    % t = t + 1;
+    t = t + 1;
 end
