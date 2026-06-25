@@ -38,6 +38,8 @@ I = [f0;f1;f2;f0;f1;f1;f2;f2;f0];
 J = [f0;f1;f2;f1;f0;f2;f1;f0;f2];
 V = [v00;v11;v22;v01;v01;v12;v12;v20;v20]/2;
 A = sparse(I,J,-V);
+% time = O(length(f)), until here the code are identical to
+% generalized_laplacian.m
 
 targetc = target(:,1) + 1i*target(:,2);
 b = -A(:,landmark)*targetc;

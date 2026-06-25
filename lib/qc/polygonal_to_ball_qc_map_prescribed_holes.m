@@ -99,9 +99,9 @@ bx(landmark) = target(:,1);
 by(landmark) = target(:,2);
 
 % solve the generalized Laplace equation
-map_x = A\bx;
-map_y = A\by;
-map = [map_x,map_y];
+map_x = A\bx; % note that we should have length(v)=max(f(:))
+map_y = A\by; % so map_x or _y are column vectors, max(f(:)) rows
+map = [map_x,map_y]; % size: max(f(:)) rows, 2 columns
 mu = beltrami_coefficient(v, f, map); 
  
 IterationNumber = 0;

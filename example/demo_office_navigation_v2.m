@@ -129,23 +129,23 @@ end
 x = [1.8;2.]; col_ = 4;
 
 vertices_all = {vertices_x, vertices_y};
-% this.vertices = polyshape(vertices_all{1}, vertices_all{2})
-% subplot(1,2,1)
-% plot(this.vertices)
-% tr = triangulation(this.vertices)
-% subplot(1,2,2)
-% triplot(tr)
-% model = createpde % create empty scalar pde structure (1 equation) 
-% geometryFromMesh(model, tr.Points', tr.ConnectivityList')
-% generateMesh(model,'Hmax',0.1)
-% v = model.Mesh.Nodes'
-% f = model.Mesh.Elements'
-% f = f(:,1:3);
-% father = unique(f)
-% index = zeros(max(father),1)
-% index(father) = (1:size(father,1))
-% face_new = index(f)
-% vertex_new = v(father,:)
+this.vertices = polyshape(vertices_all{1}, vertices_all{2})
+subplot(1,2,1)
+plot(this.vertices)
+tr = triangulation(this.vertices)
+subplot(1,2,2)
+triplot(tr)
+model = createpde % create empty scalar pde structure (1 equation) 
+geometryFromMesh(model, tr.Points', tr.ConnectivityList')
+generateMesh(model,'Hmax',0.1)
+v = model.Mesh.Nodes'
+f = model.Mesh.Elements'
+f = f(:,1:3)
+father = unique(f)
+index = zeros(max(father),1)
+index(father) = (1:size(father,1))
+face_new = index(f)
+vertex_new = v(father,:)
 % 
 % bd = meshboundaries(f)
 % 

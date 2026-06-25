@@ -12,21 +12,30 @@ function mu = beltrami_coefficient(v, f, map)
 nf = length(f);
 Mi = reshape([1:nf;1:nf;1:nf], [1,3*nf]);
 Mj = reshape(f', [1,3*nf]);
+% time = O(length(f)), since reshape read the whole matrix (column-wise)
+% structure of Mx: [1,1,1,2,2,2,3,3,3,4,4,4,...]
+%              My: [1st triangle index (3 indices), 2nd...,]
 
 e1 = v(f(:,3),1:2) - v(f(:,2),1:2);
 e2 = v(f(:,1),1:2) - v(f(:,3),1:2);
 e3 = v(f(:,2),1:2) - v(f(:,1),1:2);
+% time = O(length(f)), length of e1, e2, e3 are length(f)
 
 area = (-e2(:,1).*e1(:,2) + e1(:,1).*e2(:,2))'/2;
 area = [area;area;area];
+% time = O(length(f))
 
 Mx = reshape([e1(:,2),e2(:,2),e3(:,2)]'./area /2 , [1, 3*nf]);
 My = -reshape([e1(:,1),e2(:,1),e3(:,1)]'./area /2 , [1, 3*nf]);
+% time = O(length(f))
 
 Dx = sparse(Mi,Mj,Mx);
 Dy = sparse(Mi,Mj,My);
+% structure of Dx and Xy:
+% nf*max(f(:)) matrix with only 3*nf nonzero entries, 
+% max(f(:)) counts the maximum number in f which may not be the same as nf
 
-if size(map,2) == 3
+if size(map,2) == 3 % This is only used for 3D maps? (map_z also need to appear)
     dXdu = Dx*map(:,1);
     dXdv = Dy*map(:,1);
     dYdu = Dx*map(:,2);
@@ -39,9 +48,9 @@ if size(map,2) == 3
     F = dXdu.*dXdv + dYdu.*dYdv + dZdu.*dZdv;
     mu = (E - G + 2 * 1i * F) ./ (E + G + 2*sqrt(E.*G - F.^2));
 else
-    z = complex(map(:,1), map(:,2));
-    Dz = (Dx - 1i*Dy) / 2; Dc = (Dx + 1i*Dy) / 2;
-    mu = (Dc*z) ./ (Dz*z);
+    z = complex(map(:,1), map(:,2)); % time = O(max(f(:)))<=O(nf)
+    Dz = (Dx - 1i*Dy) / 2; Dc = (Dx + 1i*Dy) / 2;  % time = O(nf)
+    mu = (Dc*z) ./ (Dz*z); % time = O(nf), do zero entries multiplying each other in matrix multiplication also count as operations?
     mu(~isfinite(mu)) = 1;
 end
 end
