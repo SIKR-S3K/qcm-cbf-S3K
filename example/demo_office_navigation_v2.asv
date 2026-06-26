@@ -150,7 +150,7 @@ v_delunay = model_delunay.Mesh.Nodes'
 f_delunay = model_delunay.Mesh.Elements'
 f_delunay = f_delunay(:,1:3)
 
-father = unique(f)
+% father = unique(f)
 % index = zeros(max(father),1)
 % index(father) = (1:size(father,1))
 % face_new = index(f)

@@ -28,7 +28,6 @@
 function [face_new,vertex_new,father] = gpp_clean_mesh(face,vertex)
 % remove unreferenced vertex
 father = unique(face); % create a list of distinct indicies marking vertices
-% let n = numel(face), total number of elements in face
 % time = O(nlogn), since one can treat unique like sort into order, then scan
 % note that f here is the one before doing mesh cleaning,
 % and delete repeated entries:

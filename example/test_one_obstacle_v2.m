@@ -32,11 +32,11 @@ realWorld.obstacles{1}.contour = [-0.5; 0.25] + 1.1*[-0.5 -0.4 -0.4 0.4 0.4 0.5 
     -0.5 -0.5 0 0 -0.5 -0.5 0.1 0.1];
 ballWorld.domain.center = [0;0];
 ballWorld.domain.radius = 5;
-ballWorld.domain.goal = realWorld.domain.goal;
-ballWorld.obstacles{1}.center = [-0.95;0.25];
-ballWorld.obstacles{1}.centerOriginal = ballWorld.obstacles{1}.center;
-ballWorld.obstacles{1}.radius = 0.75;
-ballWorld.obstacles{1}.radiusOriginal = ballWorld.obstacles{1}.radius;
+% ballWorld.domain.goal = realWorld.domain.goal;
+% ballWorld.obstacles{1}.center = [-0.95;0.25];
+% ballWorld.obstacles{1}.centerOriginal = ballWorld.obstacles{1}.center;
+% ballWorld.obstacles{1}.radius = 0.75;
+% ballWorld.obstacles{1}.radiusOriginal = ballWorld.obstacles{1}.radius;
 
 %% init
 % real world

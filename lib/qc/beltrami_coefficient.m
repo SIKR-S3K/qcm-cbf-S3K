@@ -48,7 +48,7 @@ if size(map,2) == 3 % This is only used for 3D maps? (map_z also need to appear)
     F = dXdu.*dXdv + dYdu.*dYdv + dZdu.*dZdv;
     mu = (E - G + 2 * 1i * F) ./ (E + G + 2*sqrt(E.*G - F.^2));
 else
-    z = complex(map(:,1), map(:,2)); % time = O(max(f(:)))<=O(nf)
+    z = complex(map(:,1), map(:,2)); % time = O(max(f(:)))<=O(nf), since max(f(:)) is a vertex index, so we should have max(f(:))<=nf
     Dz = (Dx - 1i*Dy) / 2; Dc = (Dx + 1i*Dy) / 2;  % time = O(nf)
     mu = (Dc*z) ./ (Dz*z); % time = O(nf), do zero entries multiplying each other in matrix multiplication also count as operations?
     mu(~isfinite(mu)) = 1;
